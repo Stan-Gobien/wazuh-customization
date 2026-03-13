@@ -1,0 +1,67 @@
+<!-- custom rules for some common AD attacks -->
+<group name="security_event, windows,">
+  <!-- This rule detects DCSync attacks using windows security event on the domain controller -->
+  <rule id="110001" level="12">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.properties" type="pcre2">{1131f6aa-9c07-11d1-f79f-00c04fc2dcd2}|{19195a5b-6da0-11d0-afd3-00c04fd930c9}</field>
+    <options>no_full_log</options>
+    <description>Directory Service Access. Possible DCSync attack</description>
+  </rule>
+ <!-- This rule ignores Directory Service Access originating from machine accounts containing $ -->
+ <rule id="110009" level="0">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.properties" type="pcre2">{1131f6aa-9c07-11d1-f79f-00c04fc2dcd2}|{19195a5b-6da0-11d0-afd3-00c04fd930c9}</field>
+    <field name="win.eventdata.SubjectUserName" type="pcre2">\$$</field>
+    <options>no_full_log</options>
+    <description>Ignore all Directory Service Access that is originated from a machine account containing $</description>
+  </rule>
+  <!-- This rule detects Keberoasting attacks using windows security event on the domain controller -->
+  <rule id="110002" level="12">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4769$</field>
+    <field name="win.eventdata.TicketOptions" type="pcre2">0x40810000</field>
+    <field name="win.eventdata.TicketEncryptionType" type="pcre2">0x17</field>
+    <options>no_full_log</options>
+    <description>Possible Keberoasting attack</description>
+  </rule>
+  <!-- This rule detects Golden Ticket attacks using windows security events on the domain controller -->
+  <rule id="110003" level="12">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4624$</field>
+    <field name="win.eventdata.LogonGuid" type="pcre2">{00000000-0000-0000-0000-000000000000}</field>
+    <field name="win.eventdata.logonType" type="pcre2">3</field>
+    <options>no_full_log</options>
+    <description>Possible Golden Ticket attack</description>
+  </rule>
+<!-- valse positieven verminderen -->
+<group name="local,windows,dsync">
+  <rule id="112001" level="3">
+    <if_sid>110001</if_sid>
+    <description>Downgrade: AD DS 4662 door MSOL_ (legitieme AAD Connect)</description>
+    <!-- Matcht op volledige log payload (JSON/tekst) -->
+    <match>MSOL_</match>
+    <match>"eventID":"4662"</match>
+    <group>tuned,aadconnect,benign</group>
+  </rule>
+</group>
+<group name="local,windows,authentication,">
+  <!-- FP suppress: parent 110003 + Anonymous SID + NTLM -->
+  <rule id="112003" level="0">
+    <if_sid>110003</if_sid>
+    <field name="win.eventdata.targetUserSid">^S-1-5-7$</field>
+    <field name="win.eventdata.authenticationPackageName">^NTLM$</field>
+    <description>Ignore FP: 110003 triggered by ANONYMOUS LOGON (SID) with NTLM</description>
+    <options>no_full_log</options>
+  </rule>
+  <!-- FP suppress: parent 110003 + Anonymous username + NTLM -->
+  <rule id="113003" level="0">
+    <if_sid>110003</if_sid>
+    <field name="win.eventdata.targetUserName">^ANONYMOUS LOGON$</field>
+    <field name="win.eventdata.authenticationPackageName">^NTLM$</field>
+    <description>Ignore FP: 110003 triggered by ANONYMOUS LOGON (name) with NTLM</description>
+    <options>no_full_log</options>
+  </rule>
+</group>
+<!-- einde custom rules -->
