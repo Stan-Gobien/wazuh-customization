@@ -1,0 +1,12 @@
+  <decoder name="idrac_rfc5424_header">
+    <prematch type="pcre2">^&lt;\d+&gt;\d{4}-\d{2}-\d{2}T</prematch>
+    <regex type="pcre2">^&lt;\d+&gt;(\d{4}-\d{2}-\d{2}T\S+)\s+(\S+)\s+(.*)$</regex>
+    <order>timestamp,hostname,payload</order>
+  </decoder>
+
+  <decoder name="idrac_rfc5424_payload">
+    <parent>idrac_rfc5424_header</parent>
+    <prematch type="pcre2">Severity:\s</prematch>
+    <regex type="pcre2">Severity:\s*([^,]+),\s*Category:\s*([^,]+),\s*MessageID:\s*([^,]+),\s*Message:\s*(.*)$</regex>
+    <order>severity,category,message_id,message</order>
+  </decoder>
