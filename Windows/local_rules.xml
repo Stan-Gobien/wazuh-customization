@@ -1,0 +1,21 @@
+<group name="windows,sysmon,rundll32,temp">
+  <rule id="100600" level="15">
+    <if_sid>92203</if_sid>
+    <field name="win.system.eventID">1</field>
+    <match>rundll32.exe</match>
+    <field name="win.eventdata.CommandLine" type="pcre2">\AppData\\(Local|Roaming)\\Temp\\.*\.dll</field>
+    <description>Suspicious rundll32 execution from Temp/AppData folder</description>
+    <group>sysmon,rundll32,malware</group>
+  </rule>
+
+  <rule id="100601" level="0">
+    <if_sid>92203</if_sid>
+    <field name="win.system.eventID">1</field>
+    <match>rundll32.exe</match>
+    <field name="win.eventdata.CommandLine" type="pcre2">shell32\.dll</field>
+    <description>Ignore normal rundll32 shell32.dll calls</description>
+    <group>sysmon,rundll32,ignore</group>
+  </rule>
+</group>
+
+
