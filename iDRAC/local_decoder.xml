@@ -1,0 +1,5 @@
+<decoder name="idrac">
+  <prematch type="pcre2">^idrac-\S+->\d{1,3}(?:\.\d{1,3}){3}\s+\d{4}-\d{2}-\d{2}T</prematch>
+  <regex type="pcre2">^idrac-\S+->\d{1,3}(?:\.\d{1,3}){3}\s+(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+(?:Z|[+-]\d{2}:\d{2}))\s+(idrac-\S+)\s+Severity:\s*([^,]+),\s+Category:\s*([^,]+),\s+MessageID:\s*(\S+),\s+Message:\s+(.*)$</regex>
+  <order>timestamp,devicename,severity,category,message_id,message</order>
+</decoder>
