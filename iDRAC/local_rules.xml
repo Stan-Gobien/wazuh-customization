@@ -1,0 +1,38 @@
+<!-- iDRAC rules -->
+<group name="idrac,dell,hardware,authentication">
+  <!-- Basisregel: elk succesvol gedecodeerd iDRAC-event -->
+  <rule id="100500" level="3">
+    <decoded_as>idrac</decoded_as>
+    <description>Dell iDRAC event</description>
+    <group>idrac,dell</group>
+  </rule>
+  <!-- Warning events -->
+  <rule id="100501" level="6">
+    <if_sid>100500</if_sid>
+    <field name="severity">^Warning$</field>
+    <description>Dell iDRAC warning event</description>
+    <group>idrac,dell,warning</group>
+  </rule>
+  <!-- Critical events -->
+  <rule id="100502" level="10">
+    <if_sid>100500</if_sid>
+    <field name="severity">^Critical$</field>
+    <description>Dell iDRAC critical event</description>
+    <group>idrac,dell,critical</group>
+  </rule>
+  <!-- Critical Audit events -->
+  <rule id="100503" level="10">
+    <if_sid>100502</if_sid>
+    <field name="category">^Audit$</field>
+    <description>Dell iDRAC critical audit event</description>
+    <group>idrac,dell,audit,critical</group>
+  </rule>
+  <!-- Specifieke RAC9911 login attempt alert -->
+  <rule id="100504" level="10">
+    <if_sid>100503</if_sid>
+    <field name="message_id">^RAC9911$</field>
+    <description>Dell iDRAC: Critical login attempt alert (RAC9911)</description>
+    <group>idrac,dell,audit,authentication,critical</group>
+  </rule>
+</group>
+<!-- einde iDRAC rules -->
