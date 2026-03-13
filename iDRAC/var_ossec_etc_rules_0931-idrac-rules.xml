@@ -2,7 +2,7 @@
 <group name="idrac,dell,hardware,authentication">
   <!-- Basisregel: elk succesvol gedecodeerd iDRAC-event -->
   <rule id="100500" level="3">
-    <decoded_as>idrac</decoded_as>
+    <decoded_as>idrac_rfc5424_payload</decoded_as>
     <description>Dell iDRAC event</description>
     <group>idrac,dell</group>
   </rule>
